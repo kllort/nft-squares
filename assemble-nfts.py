@@ -8,7 +8,10 @@ if __name__ == "__main__":
     json_output_filename = 'output/1json.json'
     """
     The List is each folder of traits, in order of how they should be layered.
+    lists are pngs
+    Backgrounds are gifs
     """
+    backgrounds='data/bg/'
     myList=[
     'data/lion/robe/',
     'data/lion/belts/',
@@ -20,7 +23,7 @@ if __name__ == "__main__":
     'data/lion/mouth/',
     'data/lion/eyes/'
     ]
-    nft.createNFT(collection_size, myList,json_output_filename)
+    nft.createNFT(collection_size, myList,json_output_filename,backgrounds)
    
 
 
