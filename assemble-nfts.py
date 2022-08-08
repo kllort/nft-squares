@@ -1,10 +1,8 @@
 '''Layering and Combining Images'''
 import nftmaker as nft
-import datetime
 
 if __name__ == "__main__":
-
-    collection_size=100
+    collection_size=10
     json_output_filename = 'output/1json.json'
     """
     The List is each folder of traits, in order of how they should be layered.
@@ -12,6 +10,7 @@ if __name__ == "__main__":
     Backgrounds are gifs
     """
     backgrounds='data/bg/'
+    music='music/'
     myList=[
     'data/lion/robe/',
     'data/lion/belts/',
@@ -23,7 +22,7 @@ if __name__ == "__main__":
     'data/lion/mouth/',
     'data/lion/eyes/'
     ]
-    nft.createNFT(collection_size, myList,json_output_filename,backgrounds)
+    nft.createNFT(collection_size, myList,json_output_filename,backgrounds, music)
    
 
 

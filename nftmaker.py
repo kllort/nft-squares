@@ -1,9 +1,12 @@
 import random
 import os, os.path
 from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 import json
+from moviepy.editor import AudioFileClip, ImageClip
 
-def createNFT(collection_size, myList,json_output,background):
+def createNFT(collection_size, myList,json_output,background,music):
     """each layer should be organized into a folder.
         then list out the layer folders in z order in the mylist variable
         then configure and create the art in assemble.nfts.py
@@ -12,10 +15,9 @@ def createNFT(collection_size, myList,json_output,background):
     output=[]
     while i < collection_size+1:
         thisNFT = {}
-        llist= os.listdir(background)
-        lweights = create_weights(llist)
-        bg_i = pick1(llist,lweights)
-        bg = Image.open(background+bg_i[0]).convert('RGB')
+
+        ''' add a method to map backgrounds to specific beats'''
+        bg, bg_i=add_background(background)
         thisNFT[background]=bg_i[0]
         x=0 
         while x<len(myList):
@@ -27,7 +29,22 @@ def createNFT(collection_size, myList,json_output,background):
             thisNFT[trait]=choice[0]
             bg.paste(L1,(0,0),L1)
             x+=1
-        bg.save('output/output'+str(i)+'.png')
+            image_path = 'output/output'+str(i)+'.png'
+            
+            
+            llist=os.listdir(music)
+            lweights = create_weights(llist)
+            choice = pick1(llist,lweights)
+            audio_path = music + choice[0]
+            thisNFT[music]=choice[0]
+            output_path = 'output/output'+str(i)+'.mp4'
+        bg.save(image_path,quality=100)
+        bg = Image.open(image_path)
+        bg = bg.resize((1000,1000))
+        bg = add_text(bg, thisNFT)
+        bg.save(image_path,quality=100)
+        add_static_image_to_audio(image_path, audio_path, output_path)
+        os.remove(image_path)
         output.append(thisNFT)
         print(i)
         i+=1
@@ -41,9 +58,45 @@ def create_weights(llist):
     lweights=[]
     x=1
     while x<ilength+1:
-        lweights.append(100//x)
+        lweights.append(100000//x)
         x=x+1
+    print(lweights)
     return lweights
 def pick1(llist,lweights):
     myPick=random.choices(llist,lweights,k=1)
     return myPick
+
+
+
+def add_static_image_to_audio(image_path, audio_path, output_path):
+    """Create and save a video file to `output_path` after 
+    combining a static image that is located in `image_path` 
+    with an audio file in `audio_path`"""
+    # create the audio clip object
+    audio_clip = AudioFileClip(audio_path)
+    # create the image clip object
+    image_clip = ImageClip(image_path)
+    # use set_audio method from image clip to combine the audio with the image
+    video_clip = image_clip.set_audio(audio_clip)
+    # specify the duration of the new clip to be the duration of the audio clip
+    video_clip.duration = audio_clip.duration
+    # set the FPS to 1
+    video_clip.fps = 1
+    # write the resuling video clip
+    video_clip.write_videofile(output_path)
+
+def add_text(bg, thisNFT):
+    I1 =ImageDraw.Draw(bg)
+    # Custom font style and font size
+
+ 
+    # Add Text to an image
+    I1.text((10, 10), str(thisNFT).replace(",","\n"), fill =(255, 255, 255))
+    return bg
+
+def add_background(background):
+        llist= os.listdir(background)
+        lweights = create_weights(llist)
+        bg_i = pick1(llist,lweights)
+        bg = Image.open(background+bg_i[0]).convert('RGB')
+        return  bg, bg_i
